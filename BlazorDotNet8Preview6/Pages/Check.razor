@@ -1,0 +1,16 @@
+﻿@page "/check"
+@using Cypher.Components.DisplayEssentials;
+
+<Modal @ref=modal ModalContentClass="container-bg-1 rounded-5 p-7">
+    
+        <p class="mb-4">Are you sure you want to delete this product?</p>
+        <div class="d-flex flex-row-reverse gap-4">
+            <Button Variant="ButtonVariant.DangerPrimary">delete</Button>
+            <Button Variant="ButtonVariant.Secondary" OnClick="()=>modal.Close()">Cancel</Button>
+        </div>     
+</Modal>
+<Button Variant="ButtonVariant.DangerPrimary" OnClick=@(e=> modal.Open())>Delete</Button>
+@code {
+    Modal modal;
+}
+

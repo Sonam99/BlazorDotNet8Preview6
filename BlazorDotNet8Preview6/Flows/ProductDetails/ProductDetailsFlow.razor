@@ -1,0 +1,74 @@
+﻿@page "/product/{id}"
+@implements IDisposable
+@inject IProductDeleteAPI ProductDeleteAPI
+@inject EventBus EventBus
+@using BlazorDotNet8Preview6.Flows.ProductDetails.Pages
+@using BlazorDotNet8Preview6.Flows.ProductDetails.Pages.UpdateProductPage
+@using Cypher.SeedWorks
+
+@if (hasError)
+{
+ <h3>Errors</h3>
+ <p>Unable to find product with Id @id</p>
+}
+
+ else if(state !=null){
+<CascadingValue Value="state">
+        <AppFlow Routes="routes" BaseUrl=@("product/"+Id)>
+    </AppFlow>
+</CascadingValue>
+
+}
+else
+    {
+        <CircularLoader></CircularLoader>
+    }
+@code {
+    [CascadingParameter]
+    ProductState ProductState { get; set; }
+
+    [Parameter]
+    public string id { get; set; }
+
+    //[Parameter]
+    //public string? Route{ get; set; }
+
+    Dictionary<string, RenderFragment> routes = new Dictionary<string, RenderFragment>
+    {
+        { string.Empty,
+            __builder  => {
+               <ProductDetailsPage></ProductDetailsPage>
+            }
+        },
+        { "update", 
+            __builder  => {
+               <UpdateProductPage></UpdateProductPage>
+    } 
+        }
+    };
+
+    ProductDetailsState state;
+    bool hasError = false;
+
+    int Id;
+    protected override async Task OnInitializedAsync()
+    {
+        Id = Int32.Parse(id);
+
+        var product = await ProductState.GetProduct(Id);
+        if (product.IsSuccess)
+        {
+            state = new ProductDetailsState(product.Value, EventBus,ProductDeleteAPI);
+        }
+        else
+        {
+            hasError = true;
+        }
+    }
+    public void Dispose()
+    {
+        state.Dispose();
+    }
+
+
+}

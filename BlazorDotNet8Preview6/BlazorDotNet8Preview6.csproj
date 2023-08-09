@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\sa1\.nuget\packages\cypher\0.2.4\contentFiles\any\net6.0\Components\NavigationControls\BottomSideNavBarItem.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cypher" Version="0.2.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.9" />
+    <PackageReference Include="Zero.SharedKernel" Version="2.1.0-alpha.9" />
+  </ItemGroup>
+
+</Project>

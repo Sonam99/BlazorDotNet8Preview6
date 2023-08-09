@@ -1,0 +1,102 @@
+﻿@using Cypher.Components;
+@using Cypher.SeedWorks;
+@inject EventBus EventBus
+@inject IProductUpdateAPI ProductUpdateAPI
+
+<div class="container">
+    <h3 class="text-center pb-10 pt-4">Update Product Details</h3>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="container-bg-danger-1 p-4 rounded-3">@errorMessage</div>
+    }
+    <div class="row gx-14">
+       
+            <div class="col-6">
+                <InputField Invalid=State.Title.IsFailure @bind-Value=Title Placeholder="Enter name of the product">
+                   <Label>Product Title</Label>
+                   <Message>@(State.Title.IsFailure ? State.Title.Error.Message : string.Empty)</Message>
+                </InputField>
+            </div>
+           <div class="col-6">
+                <InputField Invalid=@State.Price.IsFailure @bind-Value=Price Placeholder="Enter price of the product" InputType="InputFieldType.Number">
+                   <Label>Price</Label>
+                   <Message>@(State.Price.IsFailure ? State.Price.Error.Message : string.Empty)</Message>
+                </InputField>
+            </div>
+            <div class="col-12">
+                <TextArea Invalid=@State.Description.IsFailure @bind-Value=Description Placeholder="Enter description of the product">
+                   <Label>Description</Label>
+                   <Message>@(State.Description.IsFailure ? State.Description.Error.Message : string.Empty)</Message>
+                </TextArea>
+            </div>
+    </div>
+    <div class="row justify-content-center mt-8">
+         <div class="col-6">
+                <Button Variant="Cypher.Components.ButtonVariant.Primary" OnClick=Update Disabled=@(!State.IsValid || isUpdating) FullWidth>@(isUpdating?"Updating": "Update")</Button>
+         </div>
+    </div>
+</div>
+@code {
+    bool isUpdating = false;
+    string? errorMessage;
+
+    string _title = string.Empty;
+    string Title
+    {
+        get => State.Title.IsSuccess ? State.Title.Value : _title;
+        set => State.UpdateTitle(_title = value);
+        
+    }
+
+    string? _description;
+    string? Description
+    {
+        get => State.Description.IsSuccess ? State.Description.Value : _description;
+        set => State.UpdateDescription(_description = value);
+    }
+
+    string _price = string.Empty;
+    string Price
+    {
+        get => State.Price.IsSuccess ? State.Price.Value.ToString() : _price;
+        set => State.UpdatePrice(_price = value);
+    }
+
+    [CascadingParameter]
+    AppFlow AppFlow { get; set; }
+
+    [CascadingParameter]
+    ProductDetailsState DetailsState { get; set; }
+
+    private UpdateProductState State{ get; set; }
+
+    protected override void OnInitialized()
+    {
+        State = new UpdateProductState(DetailsState.Product, EventBus, ProductUpdateAPI);
+
+        State.OnChange += StateHasChanged;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    async Task Update()
+    {
+        isUpdating = true;
+        StateHasChanged();
+        var result = await State.Update();
+        if (result.IsSuccess)
+        {
+            AppFlow.Back();
+        }
+        else
+        {
+            errorMessage = result.Error.Message;
+            isUpdating = false;
+            StateHasChanged();
+        }
+    }
+
+}

@@ -1,0 +1,92 @@
+﻿@using BlazorDotNet8Preview6.Flows.ProductDetails.Pages.Modals
+@using Cypher.Components
+@using Cypher.Components.ActionControls
+@using Cypher.SeedWorks
+@using Cypher.Components.DisplayEssentials;
+
+<div class="container mt-8">
+     <h3 class="text-center pb-14">Product Details</h3>
+        <div class="row">
+            
+                <div class="col-6 w-auto pb-12 pe-10 text-center">
+                    <img src="@State.Product.Thumbnail" class="mw-100 border container-border-3 rounded-4 h-auto" />
+                </div>
+                <div class="col-6 ">
+                    <h4 class="fg-default-1">@State.Product.Title</h4>
+                    <div class="body-lg">@State.Product.Description</div>
+                    <div class="body-lg pt-4">Price: <span class="fg-success-2 ">₹ @State.Product.Price</span></div>
+                    @*<div class="body-lg pt-4">Discount: @State.Product.DiscountPercentage</div>
+                    <div class="body-lg pt-4">Brand: @State.Product.Brand</div>
+                    <div class="body-lg pt-4">Category: @State.Product.Category</div>
+            <div class="body-lg pt-4">Rating: @State.Product.Rating</div> @(AppFlow.BaseUrl+"#update")
+            <div class="body-lg pt-4 pb-4">Stock: @State.Product.Stock</div>  "@($"/product/{(item.Id)}")" "product/"+Id
+                   *@ <span class="pe-6">
+                <Button Variant="ButtonVariant.Primary" Url="@(AppFlow.BaseUrl+"/update")">Update</Button>
+                    </span>
+                        <Button Variant="ButtonVariant.DangerPrimary" OnClick=@(e=> modal.Open())>Delete</Button>
+                </div>             
+            
+        </div>
+    </div>
+    @* <DeleteProductModal @ref=deleteModal OnDelete="()=>Delete()">
+    </DeleteProductModal> *@
+    
+
+<Modal @ref=modal ModalContentClass="container-bg-1 rounded-5 p-7">
+    @if (string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="mb-4">Are you sure you want to delete this product?</p>
+        <div class="d-flex flex-row-reverse gap-4">
+            <Button Variant="ButtonVariant.DangerPrimary" Disabled=isDeleting OnClick="() => Delete()">@(isDeleting ? "Deleting" : "Delete")</Button>
+            <Button Variant="ButtonVariant.Secondary" OnClick="()=>modal.Close()">Cancel</Button>
+        </div>
+    }
+    else
+    {
+        <p class="mb-4 fg-danger-1">@errorMessage</p>
+        <div class="d-flex flex-row-reverse gap-4">
+            <Button Variant="ButtonVariant.Secondary" OnClick="()=>Retry()">Retry</Button>
+        </div>
+    }   
+</Modal>
+
+@code {
+    [CascadingParameter]
+    ProductDetailsState State { get; set; }
+
+    [CascadingParameter]
+    AppFlow AppFlow { get; set; }
+
+    DeleteProductModal deleteModal;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        State.OnChange += StateHasChanged;
+    }
+
+   
+
+    Modal modal;
+    bool isDeleting;
+    string? errorMessage;
+
+
+    public void Open()
+    {
+        modal.Open();
+        StateHasChanged();
+    }
+
+    void Delete()
+    {
+        
+    }
+
+    void Retry()
+    {
+        errorMessage = null;
+        StateHasChanged();
+    }
+}

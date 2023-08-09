@@ -1,0 +1,54 @@
+﻿@using Cypher.SeedWorks;
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>BlazorDotNet8Preview6</title>
+    <base href="/"/>
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="BlazorDotNet8Preview6.styles.css" />
+    <link href="_content/Cypher/styles/cypher.min.css" rel="stylesheet" />
+
+</head>
+
+<body>
+   
+    <CascadingValue Value=productState>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingValue>
+
+    <script src="_framework/blazor.web.js" suppress-error="BL9992"></script>
+
+</body>
+</html>
+
+@code {
+    [Inject]
+    EventBus EventBus { get; set; }
+
+    [Inject]
+    IProductAPI ProductAPI { get; set; }
+
+    ProductState productState;
+
+    protected override void OnInitialized()
+    {
+        productState = new ProductState(ProductAPI, EventBus);
+    }
+
+
+}
